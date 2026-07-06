@@ -1,6 +1,5 @@
 package com.johnmuindi.foreheadfrenzykenya.sensor
 
-
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -40,9 +39,11 @@ class TiltDetector(
 
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
-        val y = event.values[1]
+
+        // X axis is the correct tilt axis when phone is held in landscape on forehead
+        val x = event.values[0]
         val z = event.values[2]
-        val angle = Math.toDegrees(atan2(y.toDouble(), z.toDouble())).toFloat()
+        val angle = Math.toDegrees(atan2(x.toDouble(), z.toDouble())).toFloat()
 
         if (baselineAngle == null) {
             if (System.currentTimeMillis() - startTime > calibrationDelayMs) {
@@ -63,12 +64,10 @@ class TiltDetector(
                 onTiltBackward()
             }
             abs(delta) < tiltThreshold / 2 -> {
-
                 isNeutral = true
             }
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 }

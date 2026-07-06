@@ -1,6 +1,8 @@
 package com.johnmuindi.foreheadfrenzykenya.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -10,7 +12,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-enum class RoundState { NOT_STARTED, PLAYING, ENDED }
+enum class RoundState { NOT_STARTED, COUNTDOWN, PLAYING, ENDED }
 
 class GameViewModel : ViewModel() {
 
@@ -22,17 +24,24 @@ class GameViewModel : ViewModel() {
     var currentWord by mutableStateOf("")
         private set
 
-    var score by mutableStateOf(0)
+    var score by mutableIntStateOf(0)
         private set
 
-    var skips by mutableStateOf(0)
+    var skips by mutableIntStateOf(0)
         private set
 
-    var timeLeft by mutableStateOf(60)
+    var timeLeft by mutableIntStateOf(60)
+        private set
+
+    var countdownValue by mutableIntStateOf(3)
         private set
 
     var roundState by mutableStateOf(RoundState.NOT_STARTED)
         private set
+
+    // Track words for Results screen
+    val correctWords = mutableStateListOf<String>()
+    val skippedWords = mutableStateListOf<String>()
 
     private var timerJob: Job? = null
 
@@ -42,14 +51,24 @@ class GameViewModel : ViewModel() {
         score = 0
         skips = 0
         timeLeft = durationSeconds
-        roundState = RoundState.PLAYING
+        correctWords.clear()
+        skippedWords.clear()
+        roundState = RoundState.COUNTDOWN
         nextWord()
-        startTimer()
+        startCountdownThenTimer(durationSeconds)
     }
 
-    private fun startTimer() {
+    private fun startCountdownThenTimer(durationSeconds: Int) {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
+            for (i in 3 downTo 1) {
+                countdownValue = i
+                delay(1000L)
+            }
+            countdownValue = 0
+            delay(700L)
+            roundState = RoundState.PLAYING
+            timeLeft = durationSeconds
             while (timeLeft > 0) {
                 delay(1000L)
                 timeLeft--
@@ -67,6 +86,7 @@ class GameViewModel : ViewModel() {
 
     fun markCorrect() {
         if (roundState == RoundState.PLAYING) {
+            correctWords.add(currentWord)  // capture BEFORE nextWord()
             score++
             nextWord()
         }
@@ -74,6 +94,7 @@ class GameViewModel : ViewModel() {
 
     fun markSkipped() {
         if (roundState == RoundState.PLAYING) {
+            skippedWords.add(currentWord)  // capture BEFORE nextWord()
             skips++
             nextWord()
         }
