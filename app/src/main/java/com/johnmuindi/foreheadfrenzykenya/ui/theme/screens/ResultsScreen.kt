@@ -13,8 +13,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.johnmuindi.foreheadfrenzykenya.ui.theme.ForeheadFrenzyKenyaTheme
 
 @Composable
 fun ResultsScreen(
@@ -183,5 +185,22 @@ private fun StatCard(label: String, value: String, emoji: String) {
             Text(text = label, fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+    }
+}
+@Preview(showBackground = true, widthDp = 393, heightDp = 851)
+@Composable
+fun ResultsScreenPreview() {
+    ForeheadFrenzyKenyaTheme {
+        ResultsScreen(
+            score = 7,
+            skips = 3,
+            correctWords = listOf(
+                "Nairobi", "Kisumu", "Eldoret",
+                "Nyashinski", "Ugali", "Matatu", "Gor Mahia"
+            ),
+            skippedWords = listOf("Mombasa", "Khaligraph", "Mursik"),
+            onPlayAgain = {},
+            onChangeCategory = {}
+        )
     }
 }

@@ -45,9 +45,18 @@ class GameViewModel : ViewModel() {
 
     private var timerJob: Job? = null
 
+    // Holds mixed words set up from CategoryDetailScreen
+    private var pendingMixedWords: List<String>? = null
+    fun prepareMixedRound(words: List<String>) {
+        pendingMixedWords = words
+    }
+
     fun startRound(category: Category, durationSeconds: Int = 60) {
         currentCategory = category
-        wordQueue = category.words.shuffled().toMutableList()
+        // Use mixed words if prepared, otherwise use category's own words
+        val words = pendingMixedWords ?: category.words
+        pendingMixedWords = null  // reset after consuming
+        wordQueue = words.shuffled().toMutableList()
         score = 0
         skips = 0
         timeLeft = durationSeconds
@@ -57,7 +66,6 @@ class GameViewModel : ViewModel() {
         nextWord()
         startCountdownThenTimer(durationSeconds)
     }
-
     private fun startCountdownThenTimer(durationSeconds: Int) {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {

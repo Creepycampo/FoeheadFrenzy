@@ -21,9 +21,11 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController,startDestination = Screen.Home.route){
                         composable(Screen.Home.route){
-                            HomeScreen(onPlayClick = {
-                                navController.navigate(Screen.CategoryPicker.route)
-                            }
+                            HomeScreen(
+                                onPlayClick = {
+                                    navController.navigate(Screen.CategoryPicker.route)
+                                },
+                                onHowToPlayClick = TODO()
                             )
                         }
                     }
